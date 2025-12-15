@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Product } from '@/types/oceane';
 import { categories } from '@/data/oceaneData';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { Upload, Link, X } from 'lucide-react';
+import { toast } from 'sonner';
 
 interface ProductFormProps {
   open: boolean;
@@ -36,9 +38,54 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
     image: initialData?.image || '',
     description: initialData?.description || '',
   });
+  const [imageMode, setImageMode] = useState<'upload' | 'url'>('upload');
+  const [imagePreview, setImagePreview] = useState<string>(initialData?.image || '');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Veuillez sélectionner une image');
+      return;
+    }
+
+    // Validate file size (max 2MB for localStorage)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image trop grande (max 2MB)');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64 = reader.result as string;
+      setFormData({ ...formData, image: base64 });
+      setImagePreview(base64);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleUrlChange = (url: string) => {
+    setFormData({ ...formData, image: url });
+    setImagePreview(url);
+  };
+
+  const clearImage = () => {
+    setFormData({ ...formData, image: '' });
+    setImagePreview('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!formData.image) {
+      toast.error('Veuillez ajouter une image');
+      return;
+    }
     onSubmit({
       name: formData.name.trim(),
       category: formData.category,
@@ -54,6 +101,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
       image: '',
       description: '',
     });
+    setImagePreview('');
   };
 
   return (
@@ -111,15 +159,74 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="image">URL de l'image</Label>
-            <Input
-              id="image"
-              type="url"
-              value={formData.image}
-              onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              placeholder="https://..."
-              required
-            />
+            <Label>Image du produit</Label>
+            <div className="flex gap-2 mb-2">
+              <Button
+                type="button"
+                variant={imageMode === 'upload' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setImageMode('upload')}
+              >
+                <Upload className="h-4 w-4 mr-1" />
+                Upload
+              </Button>
+              <Button
+                type="button"
+                variant={imageMode === 'url' ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setImageMode('url')}
+              >
+                <Link className="h-4 w-4 mr-1" />
+                URL
+              </Button>
+            </div>
+
+            {imageMode === 'upload' ? (
+              <div
+                className="border-2 border-dashed rounded-lg p-4 text-center cursor-pointer hover:border-primary transition-colors"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
+                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">
+                  Cliquez pour sélectionner une image
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">Max 2MB</p>
+              </div>
+            ) : (
+              <Input
+                type="url"
+                value={formData.image.startsWith('data:') ? '' : formData.image}
+                onChange={(e) => handleUrlChange(e.target.value)}
+                placeholder="https://..."
+              />
+            )}
+
+            {imagePreview && (
+              <div className="relative mt-2">
+                <img
+                  src={imagePreview}
+                  alt="Aperçu"
+                  className="w-full h-32 object-cover rounded-lg"
+                  onError={() => setImagePreview('')}
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 h-6 w-6"
+                  onClick={clearImage}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
 
           <div className="space-y-2">
