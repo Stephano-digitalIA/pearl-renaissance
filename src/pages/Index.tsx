@@ -7,6 +7,8 @@ import CartDrawer from '@/components/oceane/CartDrawer';
 import Testimonials from '@/components/oceane/Testimonials';
 import NewsletterCTA from '@/components/oceane/NewsletterCTA';
 import Footer from '@/components/oceane/Footer';
+import LocationBanner from '@/components/oceane/LocationBanner';
+import ShippingInfo from '@/components/oceane/ShippingInfo';
 import { products, testimonials, categories } from '@/data/oceaneData';
 import { Product } from '@/types/oceane';
 
@@ -39,6 +41,7 @@ const Index = () => {
       />
       
       <Hero />
+      <LocationBanner />
 
       <main>
         {/* Section Collections */}
@@ -77,6 +80,7 @@ const Index = () => {
         </section>
 
         <StorySection />
+        <ShippingInfo />
         <Testimonials testimonials={testimonials} />
         <NewsletterCTA />
       </main>
