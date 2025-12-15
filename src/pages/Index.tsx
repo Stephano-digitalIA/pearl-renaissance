@@ -9,13 +9,19 @@ import NewsletterCTA from '@/components/oceane/NewsletterCTA';
 import Footer from '@/components/oceane/Footer';
 import LocationBanner from '@/components/oceane/LocationBanner';
 import ShippingInfo from '@/components/oceane/ShippingInfo';
-import { products, testimonials, categories } from '@/data/oceaneData';
+import { ProductManager } from '@/components/oceane/ProductManager';
+import { useProducts } from '@/hooks/useProducts';
+import { testimonials, categories } from '@/data/oceaneData';
 import { Product } from '@/types/oceane';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
 
 const Index = () => {
+  const { products } = useProducts();
   const [cart, setCart] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Tous');
+  const [isManagerOpen, setIsManagerOpen] = useState(false);
 
   const filteredProducts = activeCategory === 'Tous' 
     ? products 
@@ -46,7 +52,16 @@ const Index = () => {
       <main>
         {/* Section Collections */}
         <section id="collections" className="py-20 md:py-32 container mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-0"
+              onClick={() => setIsManagerOpen(true)}
+              title="Gérer le catalogue"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
             <span className="text-ocean-teal uppercase tracking-[0.2em] text-sm font-semibold">
               Nos Créations
             </span>
@@ -86,6 +101,7 @@ const Index = () => {
       </main>
 
       <Footer />
+      <ProductManager open={isManagerOpen} onClose={() => setIsManagerOpen(false)} />
     </div>
   );
 };
