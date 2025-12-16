@@ -48,11 +48,27 @@ export const useProducts = () => {
     saveProducts(products.filter(p => p.id !== id));
   };
 
+  const resetProductsStorage = () => {
+    // Frees localStorage space and restores the default catalog
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignore
+    }
+    setProducts(initialProducts);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(initialProducts));
+    } catch (err) {
+      console.error('Failed to persist products to localStorage', err);
+    }
+  };
+
   return {
     products,
     loading,
     addProduct,
     updateProduct,
     deleteProduct,
+    resetProductsStorage,
   };
 };

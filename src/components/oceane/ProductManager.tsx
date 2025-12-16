@@ -26,7 +26,7 @@ interface ProductManagerProps {
 }
 
 export const ProductManager = ({ open, onClose }: ProductManagerProps) => {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, resetProductsStorage } = useProducts();
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
@@ -55,6 +55,17 @@ export const ProductManager = ({ open, onClose }: ProductManagerProps) => {
     }
   };
 
+  const handleResetStorage = () => {
+    if (
+      confirm(
+        'Réinitialiser le catalogue ? Cela supprime les produits ajoutés localement et libère de la place de stockage.'
+      )
+    ) {
+      resetProductsStorage();
+      toast.success('Catalogue réinitialisé');
+    }
+  };
+
   const handleFormClose = () => {
     setFormOpen(false);
     setEditingProduct(undefined);
@@ -71,7 +82,10 @@ export const ProductManager = ({ open, onClose }: ProductManagerProps) => {
             </DialogTitle>
           </DialogHeader>
           
-          <div className="flex justify-end mb-4">
+          <div className="flex items-center justify-end gap-2 mb-4">
+            <Button variant="outline" size="sm" onClick={handleResetStorage}>
+              Réinitialiser
+            </Button>
             <Button onClick={() => setFormOpen(true)} size="sm">
               <Plus className="h-4 w-4 mr-2" />
               Ajouter un produit
