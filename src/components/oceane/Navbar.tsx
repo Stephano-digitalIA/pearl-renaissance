@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Search, Settings } from 'lucide-react';
+import { ShoppingBag, Menu, Search, X } from 'lucide-react';
 
 interface NavbarProps {
   cartCount: number;
   setIsCartOpen: (open: boolean) => void;
-  onOpenManager: () => void;
 }
 
-const Navbar = ({ cartCount, setIsCartOpen, onOpenManager }: NavbarProps) => {
+const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -36,13 +35,6 @@ const Navbar = ({ cartCount, setIsCartOpen, onOpenManager }: NavbarProps) => {
 
         <div className="flex items-center space-x-6">
           <Search className="w-5 h-5 cursor-pointer hover:text-sand-gold transition-colors hidden sm:block" />
-          <div 
-            className="cursor-pointer" 
-            onClick={onOpenManager}
-            title="Gérer le catalogue"
-          >
-            <Settings className="w-5 h-5 hover:text-sand-gold transition-colors" />
-          </div>
           <div className="relative cursor-pointer" onClick={() => setIsCartOpen(true)}>
             <ShoppingBag className="w-5 h-5 hover:text-sand-gold transition-colors" />
             {cartCount > 0 && (

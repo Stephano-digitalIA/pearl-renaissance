@@ -13,6 +13,8 @@ import { ProductManager } from '@/components/oceane/ProductManager';
 import { useProducts } from '@/hooks/useProducts';
 import { testimonials, categories } from '@/data/oceaneData';
 import { Product } from '@/types/oceane';
+import { Button } from '@/components/ui/button';
+import { Settings } from 'lucide-react';
 
 const Index = () => {
   const { products } = useProducts();
@@ -36,7 +38,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar cartCount={cart.length} setIsCartOpen={setIsCartOpen} onOpenManager={() => setIsManagerOpen(true)} />
+      <Navbar cartCount={cart.length} setIsCartOpen={setIsCartOpen} />
       <CartDrawer 
         isOpen={isCartOpen} 
         closeCart={() => setIsCartOpen(false)} 
@@ -50,7 +52,16 @@ const Index = () => {
       <main>
         {/* Section Collections */}
         <section id="collections" className="py-20 md:py-32 container mx-auto px-6">
-          <div className="text-center mb-16">
+          <div className="text-center mb-16 relative">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-0 top-0"
+              onClick={() => setIsManagerOpen(true)}
+              title="Gérer le catalogue"
+            >
+              <Settings className="h-5 w-5" />
+            </Button>
             <span className="text-ocean-teal uppercase tracking-[0.2em] text-sm font-semibold">
               Nos Créations
             </span>

@@ -52,9 +52,9 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
       return;
     }
 
-    // Validate file size (max 6MB for localStorage)
-    if (file.size > 6 * 1024 * 1024) {
-      toast.error('Image trop grande (max 6MB)');
+    // Validate file size (max 2MB for localStorage)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('Image trop grande (max 2MB)');
       return;
     }
 
@@ -197,7 +197,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
                 <p className="text-sm text-muted-foreground">
                   Cliquez pour sélectionner une image
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">Max 6MB</p>
+                <p className="text-xs text-muted-foreground mt-1">Max 2MB</p>
               </div>
             ) : (
               <Input
