@@ -35,7 +35,9 @@ const ProductCard = ({ product, addToCart }: ProductCardProps) => {
         </button>
       </div>
       <div className="px-4 text-center">
-        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{product.category}</p>
+        <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+          {t(`collections.${product.category === 'Colliers' ? 'necklaces' : product.category === "Boucles d'oreilles" ? 'earrings' : product.category === 'Bracelets' ? 'bracelets' : 'rings'}`)}
+        </p>
         <div className="flex items-center justify-center gap-2 mb-2">
           <h3 className="font-serif text-xl text-foreground group-hover:text-sand-gold transition-colors">
             {product.name}
