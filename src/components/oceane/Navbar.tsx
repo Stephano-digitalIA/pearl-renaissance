@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ShoppingBag, Search, User, Menu, ChevronDown, X } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useLocale } from '@/contexts/LocaleContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 import { Input } from '@/components/ui/input';
@@ -73,10 +74,10 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
               <Search className="w-5 h-5" />
             </button>
 
-            <a href="#" className="hidden sm:flex items-center gap-2 text-sm hover:text-primary transition-colors">
+            <Link to="/profile" className="hidden sm:flex items-center gap-2 text-sm hover:text-primary transition-colors">
               <User className="w-5 h-5" />
               <span className="hidden lg:inline">{t('nav.account')}</span>
-            </a>
+            </Link>
 
             <button
               className="relative p-2 hover:bg-muted rounded-full flex items-center gap-2"
@@ -171,10 +172,10 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
               <a href="#contact" className="block py-2 hover:text-primary transition-colors">{t('nav.contact')}</a>
             </div>
             <div className="border-t border-border pt-4">
-              <a href="#" className="flex items-center gap-2 py-2 hover:text-primary transition-colors">
+              <Link to="/profile" className="flex items-center gap-2 py-2 hover:text-primary transition-colors" onClick={() => setMobileMenuOpen(false)}>
                 <User className="w-5 h-5" />
                 {t('nav.account')}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
