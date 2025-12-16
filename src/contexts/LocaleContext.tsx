@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export type Locale = 'fr' | 'en' | 'es' | 'de' | 'ja' | 'it' | 'pt' | 'nl';
-export type Currency = 'XPF' | 'EUR' | 'USD' | 'JPY' | 'BRL';
+export type Currency = 'XPF' | 'EUR' | 'USD';
 
 interface LocaleConfig {
   locale: Locale;
@@ -13,38 +13,46 @@ interface LocaleConfig {
 const localeConfigs: Record<string, LocaleConfig> = {
   // French Polynesia (default)
   PF: { locale: 'fr', currency: 'XPF', currencySymbol: 'XPF', exchangeRate: 1 },
-  // France
+  // European countries - EUR
   FR: { locale: 'fr', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // USA
-  US: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
-  // UK
-  GB: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
-  // Spain
   ES: { locale: 'es', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Germany
   DE: { locale: 'de', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Austria
   AT: { locale: 'de', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Switzerland
   CH: { locale: 'de', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Japan
-  JP: { locale: 'ja', currency: 'JPY', currencySymbol: '¥', exchangeRate: 1.36 },
-  // Italy
   IT: { locale: 'it', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Portugal
   PT: { locale: 'pt', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Brazil
-  BR: { locale: 'pt', currency: 'BRL', currencySymbol: 'R$', exchangeRate: 0.046 },
-  // Netherlands
   NL: { locale: 'nl', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Belgium
   BE: { locale: 'nl', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
-  // Mexico
+  GB: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  IE: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  GR: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  FI: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  SE: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  DK: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  NO: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  PL: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  CZ: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  HU: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  RO: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  BG: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  HR: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  SK: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  SI: { locale: 'en', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  LU: { locale: 'fr', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  MC: { locale: 'fr', currency: 'EUR', currencySymbol: '€', exchangeRate: 0.00838 },
+  // Rest of the world - USD
+  US: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
+  CA: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
+  JP: { locale: 'ja', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
+  BR: { locale: 'pt', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
   MX: { locale: 'es', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
-  // Argentina
   AR: { locale: 'es', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
-  // Default fallback
-  default: { locale: 'fr', currency: 'XPF', currencySymbol: 'XPF', exchangeRate: 1 },
+  AU: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
+  NZ: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
+  CN: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
+  KR: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
+  // Default fallback - USD for rest of world
+  default: { locale: 'en', currency: 'USD', currencySymbol: '$', exchangeRate: 0.0091 },
 };
 
 interface LocaleContextType {
@@ -794,12 +802,6 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     }
     if (config.currency === 'EUR') {
       return `${converted.toLocaleString('fr-FR')} €`;
-    }
-    if (config.currency === 'JPY') {
-      return `¥${converted.toLocaleString('ja-JP')}`;
-    }
-    if (config.currency === 'BRL') {
-      return `R$ ${converted.toLocaleString('pt-BR')}`;
     }
     return `$${converted.toLocaleString('en-US')}`;
   };
