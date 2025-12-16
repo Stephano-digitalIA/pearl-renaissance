@@ -40,8 +40,8 @@ const Index = () => {
 
   // Translate category names
   const translateCategory = (cat: string) => {
-    if (cat === 'Tous') return locale === 'en' ? 'All' : 'Tous';
-    return cat;
+    if (cat === 'Tous') return t('collections.all');
+    return t(`category.${cat}`);
   };
 
   return (
