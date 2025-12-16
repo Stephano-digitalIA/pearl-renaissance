@@ -27,7 +27,7 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
     }`}>
       <div className="container mx-auto px-6 flex justify-between items-center">
         <div className="text-xl font-serif font-bold tracking-widest cursor-pointer">
-          DEESSEDIAMS RENAISSANCE
+          DEESSE PEARLS RENAISSANCE
         </div>
         
         <div className="hidden md:flex space-x-8 text-sm tracking-wide font-medium uppercase">
