@@ -5,7 +5,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 
 const ShippingInfo = () => {
   const { location } = useGeolocation();
-  const { t, formatPrice, locale } = useLocale();
+  const { t, formatPrice } = useLocale();
 
   return (
     <section id="atelier" className="py-20 bg-muted/50">
@@ -58,8 +58,8 @@ const ShippingInfo = () => {
               <thead className="bg-ocean-dark text-primary-foreground">
                 <tr>
                   <th className="px-6 py-4 text-left font-serif text-lg">Zone</th>
-                  <th className="px-6 py-4 text-center font-serif text-lg">{locale === 'en' ? 'Base fee' : 'Frais de base'}</th>
-                  <th className="px-6 py-4 text-center font-serif text-lg">{locale === 'en' ? 'Est. delivery' : 'Délai estimé'}</th>
+                  <th className="px-6 py-4 text-center font-serif text-lg">{t('shipping.baseFee')}</th>
+                  <th className="px-6 py-4 text-center font-serif text-lg">{t('shipping.estDelivery')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -80,14 +80,14 @@ const ShippingInfo = () => {
                           </span>
                           {isCurrentZone && (
                             <span className="text-xs bg-ocean-teal text-primary-foreground px-2 py-0.5 rounded-full">
-                              {locale === 'en' ? 'Your zone' : 'Votre zone'}
+                              {t('shipping.yourZone')}
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span className={`font-semibold ${zone.baseCost === 0 ? 'text-ocean-teal' : 'text-foreground'}`}>
-                          {zone.baseCost === 0 ? (locale === 'en' ? 'Free' : 'Gratuit') : formatPrice(calculateShippingCost(zone) * 119.33)}
+                          {zone.baseCost === 0 ? t('shipping.free') : formatPrice(calculateShippingCost(zone) * 119.33)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center text-muted-foreground">
@@ -102,9 +102,7 @@ const ShippingInfo = () => {
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          {locale === 'en' 
-            ? '* Fees may vary depending on weight and dimensions. Free shipping in French Polynesia.'
-            : '* Les frais peuvent varier selon le poids et les dimensions du colis. Livraison gratuite en Polynésie Française.'}
+          {t('shipping.note')}
         </p>
       </div>
     </section>
