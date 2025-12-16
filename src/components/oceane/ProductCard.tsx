@@ -48,7 +48,7 @@ const ProductCard = ({ product, addToCart }: ProductCardProps) => {
                 </button>
               </TooltipTrigger>
               <TooltipContent className="max-w-xs">
-                <p>{product.description}</p>
+                <p>{t(`product.${product.id}.description`) !== `product.${product.id}.description` ? t(`product.${product.id}.description`) : product.description}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
