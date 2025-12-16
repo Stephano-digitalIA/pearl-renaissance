@@ -198,7 +198,12 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
   };
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog
+      open={open}
+      onOpenChange={(nextOpen) => {
+        if (!nextOpen) onClose();
+      }}
+    >
       <DialogContent className="sm:max-w-[500px] bg-background">
         <DialogHeader>
           <DialogTitle className="font-serif text-xl">
