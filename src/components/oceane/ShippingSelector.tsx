@@ -1,6 +1,8 @@
-import { useState } from 'react';
-import { Check, Truck, MapPin } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Check, Truck, MapPin, User } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useUserProfile } from '@/contexts/UserProfileContext';
 import { 
   shippingCarriers, 
   ShippingCarrier, 
@@ -24,7 +26,19 @@ interface ShippingSelectorProps {
 
 const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: ShippingSelectorProps) => {
   const { formatPrice, t, countryCode } = useLocale();
-  const [destinationCountry, setDestinationCountry] = useState(countryCode || 'FR');
+  const { shippingCountryCode } = useUserProfile();
+  
+  // Use profile shipping country if set, otherwise fallback to detected country
+  const [destinationCountry, setDestinationCountry] = useState(
+    shippingCountryCode || countryCode || 'FR'
+  );
+  
+  // Update when profile shipping country changes
+  useEffect(() => {
+    if (shippingCountryCode) {
+      setDestinationCountry(shippingCountryCode);
+    }
+  }, [shippingCountryCode]);
   
   const zone = getZoneFromCountry(destinationCountry);
   
@@ -62,6 +76,19 @@ const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: S
 
   return (
     <div className="space-y-4">
+      {/* Profile shipping address indicator */}
+      {shippingCountryCode && (
+        <div className="bg-primary/10 rounded-lg p-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-foreground">
+            <User className="w-4 h-4" />
+            <span>{t('cart.usingProfileAddress')}</span>
+          </div>
+          <Link to="/profile" className="text-xs text-primary hover:underline">
+            {t('cart.editProfile')}
+          </Link>
+        </div>
+      )}
+      
       {/* Destination selection */}
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm font-medium text-foreground">
