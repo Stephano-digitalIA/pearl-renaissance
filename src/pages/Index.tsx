@@ -9,7 +9,7 @@ import Testimonials from '@/components/oceane/Testimonials';
 import NewsletterCTA from '@/components/oceane/NewsletterCTA';
 import Footer from '@/components/oceane/Footer';
 import LocationBanner from '@/components/oceane/LocationBanner';
-import ShippingInfo from '@/components/oceane/ShippingInfo';
+
 import { ProductManager } from '@/components/oceane/ProductManager';
 import { useProducts } from '@/hooks/useProducts';
 import { useLocale } from '@/contexts/LocaleContext';
@@ -88,7 +88,6 @@ const Index = () => {
         </section>
 
         <StorySection />
-        <ShippingInfo />
         <Testimonials testimonials={testimonials} />
         <NewsletterCTA />
       </main>

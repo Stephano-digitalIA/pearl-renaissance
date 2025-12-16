@@ -21,10 +21,13 @@ const CartDrawer = ({ isOpen, closeCart, cartItems, removeFromCart }: CartDrawer
   const subtotal = cartItems.reduce((acc, item) => acc + item.price, 0);
   const total = subtotal + shippingCost;
 
-  const handleShippingSelect = (carrier: ShippingCarrier, cost: number) => {
+  const handleShippingSelect = (carrier: ShippingCarrier | null, cost: number) => {
     setSelectedCarrier(carrier);
     setShippingCost(cost);
   };
+
+  // Allow checkout if carrier is selected OR if shipping cost is 0 (free local delivery)
+  const canCheckout = cartItems.length > 0 && (selectedCarrier !== null || shippingCost === 0);
 
   return (
     <>
@@ -115,9 +118,12 @@ const CartDrawer = ({ isOpen, closeCart, cartItems, removeFromCart }: CartDrawer
               <div className="flex justify-between items-center text-sm text-muted-foreground">
                 <span>{t('cart.shippingFee')}</span>
                 <span>
-                  {selectedCarrier 
-                    ? (shippingCost === 0 ? t('cart.freeShipping') : formatPrice(shippingCost))
-                    : t('cart.selectCarrierFirst')
+                  {shippingCost === 0 && selectedCarrier === null
+                    ? t('cart.freeLocalDelivery')
+                    : (selectedCarrier 
+                      ? formatPrice(shippingCost)
+                      : t('cart.selectCarrierFirst')
+                    )
                   }
                 </span>
               </div>
@@ -129,11 +135,11 @@ const CartDrawer = ({ isOpen, closeCart, cartItems, removeFromCart }: CartDrawer
           </div>
           <button 
             className="w-full bg-ocean-dark text-primary-foreground py-4 uppercase text-sm tracking-widest hover:bg-ocean-teal transition-colors disabled:opacity-50"
-            disabled={cartItems.length === 0 || !selectedCarrier}
+            disabled={!canCheckout}
           >
             {t('cart.checkout')}
           </button>
-          {cartItems.length > 0 && !selectedCarrier && (
+          {cartItems.length > 0 && !canCheckout && (
             <p className="text-xs text-center text-muted-foreground">
               {t('cart.pleaseSelectCarrier')}
             </p>
