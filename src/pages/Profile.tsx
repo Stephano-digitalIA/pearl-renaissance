@@ -46,10 +46,14 @@ const Profile = () => {
   const { toast } = useToast();
   
   const [formData, setFormData] = useState<UserProfile>(profile);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    setFormData(profile);
-  }, [profile]);
+    if (!isInitialized) {
+      setFormData(profile);
+      setIsInitialized(true);
+    }
+  }, [profile, isInitialized]);
 
   const handleInputChange = (field: keyof UserProfile, value: string | boolean) => {
     setFormData(prev => ({ ...prev, [field]: value }));
