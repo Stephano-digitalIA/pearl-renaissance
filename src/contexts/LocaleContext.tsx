@@ -59,6 +59,7 @@ interface LocaleContextType {
   locale: Locale;
   setLocale: (locale: Locale) => void;
   currency: Currency;
+  setCurrency: (currency: Currency) => void;
   currencySymbol: string;
   formatPrice: (priceXPF: number) => string;
   t: (key: string) => string;
@@ -847,10 +848,18 @@ const translations: Record<Locale, Record<string, string>> = {
   },
 };
 
+const currencyConfigs: Record<Currency, { symbol: string; exchangeRate: number }> = {
+  XPF: { symbol: 'XPF', exchangeRate: 1 },
+  EUR: { symbol: '€', exchangeRate: 0.00838 },
+  USD: { symbol: '$', exchangeRate: 0.0091 },
+};
+
 export const LocaleProvider = ({ children }: { children: ReactNode }) => {
   const [countryCode, setCountryCode] = useState('PF');
   const [locale, setLocale] = useState<Locale>('fr');
-  const [config, setConfig] = useState<LocaleConfig>(localeConfigs.default);
+  const [currency, setCurrencyState] = useState<Currency>('XPF');
+  const [currencySymbol, setCurrencySymbol] = useState('XPF');
+  const [exchangeRate, setExchangeRate] = useState(1);
 
   // Detect country on mount
   useEffect(() => {
@@ -861,8 +870,10 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
         const code = data.country_code || 'PF';
         setCountryCode(code);
         const cfg = localeConfigs[code] || localeConfigs.default;
-        setConfig(cfg);
         setLocale(cfg.locale);
+        setCurrencyState(cfg.currency);
+        setCurrencySymbol(currencyConfigs[cfg.currency].symbol);
+        setExchangeRate(currencyConfigs[cfg.currency].exchangeRate);
       } catch {
         // Keep defaults (Polynesia)
       }
@@ -870,17 +881,18 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     detectCountry();
   }, []);
 
-  // Update config when locale changes manually
-  useEffect(() => {
-    setConfig(prev => ({ ...prev, locale }));
-  }, [locale]);
+  const setCurrency = (newCurrency: Currency) => {
+    setCurrencyState(newCurrency);
+    setCurrencySymbol(currencyConfigs[newCurrency].symbol);
+    setExchangeRate(currencyConfigs[newCurrency].exchangeRate);
+  };
 
   const formatPrice = (priceXPF: number): string => {
-    const converted = Math.round(priceXPF * config.exchangeRate);
-    if (config.currency === 'XPF') {
+    const converted = Math.round(priceXPF * exchangeRate);
+    if (currency === 'XPF') {
       return `${converted.toLocaleString('fr-FR')} XPF`;
     }
-    if (config.currency === 'EUR') {
+    if (currency === 'EUR') {
       return `${converted.toLocaleString('fr-FR')} €`;
     }
     return `$${converted.toLocaleString('en-US')}`;
@@ -895,8 +907,9 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
       value={{
         locale,
         setLocale,
-        currency: config.currency,
-        currencySymbol: config.currencySymbol,
+        currency,
+        setCurrency,
+        currencySymbol,
         formatPrice,
         t,
         countryCode,

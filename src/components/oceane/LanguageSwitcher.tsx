@@ -1,4 +1,4 @@
-import { useLocale, Locale } from '@/contexts/LocaleContext';
+import { useLocale, Locale, Currency } from '@/contexts/LocaleContext';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -19,8 +19,14 @@ const languages: { code: Locale; label: string; flag: string }[] = [
   { code: 'ja', label: '日本語', flag: '🇯🇵' },
 ];
 
+const currencies: { code: Currency; label: string }[] = [
+  { code: 'XPF', label: 'XPF' },
+  { code: 'EUR', label: 'EUR €' },
+  { code: 'USD', label: 'USD $' },
+];
+
 export const LanguageSwitcher = () => {
-  const { locale, setLocale, currency } = useLocale();
+  const { locale, setLocale, currency, setCurrency } = useLocale();
   const current = languages.find((l) => l.code === locale) || languages[0];
 
   return (
@@ -45,7 +51,24 @@ export const LanguageSwitcher = () => {
           ))}
         </DropdownMenuContent>
       </DropdownMenu>
-      <span className="text-sm text-muted-foreground hidden sm:inline">{currency}</span>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" size="sm" className="text-sm px-2">
+            {currency}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="bg-background z-50">
+          {currencies.map((cur) => (
+            <DropdownMenuItem
+              key={cur.code}
+              onClick={() => setCurrency(cur.code)}
+              className={currency === cur.code ? 'bg-accent' : ''}
+            >
+              {cur.label}
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };
