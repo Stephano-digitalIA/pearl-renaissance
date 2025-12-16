@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Product } from '@/types/oceane';
 import { categories } from '@/data/oceaneData';
 import { Button } from '@/components/ui/button';
@@ -42,6 +42,21 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
   const [imagePreview, setImagePreview] = useState<string>(initialData?.image || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Reset form when dialog opens or initialData changes
+  useEffect(() => {
+    if (open) {
+      setFormData({
+        name: initialData?.name || '',
+        category: initialData?.category || productCategories[0],
+        price: initialData?.price?.toString() || '',
+        image: initialData?.image || '',
+        description: initialData?.description || '',
+      });
+      setImagePreview(initialData?.image || '');
+      setImageMode('upload');
+    }
+  }, [open, initialData]);
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -61,19 +76,19 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64 = reader.result as string;
-      setFormData({ ...formData, image: base64 });
+      setFormData(prev => ({ ...prev, image: base64 }));
       setImagePreview(base64);
     };
     reader.readAsDataURL(file);
   };
 
   const handleUrlChange = (url: string) => {
-    setFormData({ ...formData, image: url });
+    setFormData(prev => ({ ...prev, image: url }));
     setImagePreview(url);
   };
 
   const clearImage = () => {
-    setFormData({ ...formData, image: '' });
+    setFormData(prev => ({ ...prev, image: '' }));
     setImagePreview('');
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -118,7 +133,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
               placeholder="Ex: Larme du Lagon"
               required
               maxLength={100}
@@ -129,7 +144,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
             <Label htmlFor="category">Catégorie</Label>
             <Select
               value={formData.category}
-              onValueChange={(value) => setFormData({ ...formData, category: value })}
+              onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -152,7 +167,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
               min="0"
               step="1"
               value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, price: e.target.value }))}
               placeholder="1250"
               required
             />
@@ -234,7 +249,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               placeholder="Description du bijou..."
               rows={3}
               maxLength={500}
