@@ -1,19 +1,21 @@
 import { Truck, Clock, Shield, MapPin } from 'lucide-react';
-import { shippingZones, ShippingZone, calculateShippingCost } from '@/types/geolocation';
+import { shippingZones, calculateShippingCost } from '@/types/geolocation';
 import { useGeolocation } from '@/hooks/useGeolocation';
+import { useLocale } from '@/contexts/LocaleContext';
 
 const ShippingInfo = () => {
   const { location } = useGeolocation();
+  const { t, formatPrice, locale } = useLocale();
 
   return (
     <section id="atelier" className="py-20 bg-muted/50">
       <div className="container mx-auto px-6">
         <div className="text-center mb-16">
           <span className="text-ocean-teal uppercase tracking-[0.2em] text-sm font-semibold">
-            Livraison Mondiale
+            {t('shipping.worldwide')}
           </span>
           <h2 className="font-serif text-4xl md:text-5xl mt-3 text-foreground">
-            Nos Zones de Livraison
+            {t('shipping.title')}
           </h2>
           <div className="w-20 h-0.5 bg-sand-gold mx-auto mt-6"></div>
         </div>
@@ -24,27 +26,27 @@ const ShippingInfo = () => {
             <div className="w-16 h-16 mx-auto mb-4 bg-ocean-teal/10 rounded-full flex items-center justify-center">
               <Truck className="w-8 h-8 text-ocean-teal" />
             </div>
-            <h3 className="font-serif text-xl mb-2 text-foreground">Livraison Sécurisée</h3>
+            <h3 className="font-serif text-xl mb-2 text-foreground">{t('shipping.worldwide')}</h3>
             <p className="text-muted-foreground text-sm">
-              Tous nos bijoux sont expédiés dans un écrin de luxe, assurés et suivis.
+              {t('shipping.worldwideDesc')}
             </p>
           </div>
           <div className="text-center p-6">
             <div className="w-16 h-16 mx-auto mb-4 bg-sand-gold/10 rounded-full flex items-center justify-center">
               <Shield className="w-8 h-8 text-sand-gold" />
             </div>
-            <h3 className="font-serif text-xl mb-2 text-foreground">Garantie Authenticité</h3>
+            <h3 className="font-serif text-xl mb-2 text-foreground">{t('shipping.certificate')}</h3>
             <p className="text-muted-foreground text-sm">
-              Certificat d'authenticité inclus avec chaque perle de Tahiti.
+              {t('shipping.certificateDesc')}
             </p>
           </div>
           <div className="text-center p-6">
             <div className="w-16 h-16 mx-auto mb-4 bg-ocean-teal/10 rounded-full flex items-center justify-center">
               <Clock className="w-8 h-8 text-ocean-teal" />
             </div>
-            <h3 className="font-serif text-xl mb-2 text-foreground">Retours Gratuits</h3>
+            <h3 className="font-serif text-xl mb-2 text-foreground">{t('shipping.packaging')}</h3>
             <p className="text-muted-foreground text-sm">
-              30 jours pour retourner votre commande sans frais.
+              {t('shipping.packagingDesc')}
             </p>
           </div>
         </div>
@@ -56,8 +58,8 @@ const ShippingInfo = () => {
               <thead className="bg-ocean-dark text-primary-foreground">
                 <tr>
                   <th className="px-6 py-4 text-left font-serif text-lg">Zone</th>
-                  <th className="px-6 py-4 text-center font-serif text-lg">Frais de base</th>
-                  <th className="px-6 py-4 text-center font-serif text-lg">Délai estimé</th>
+                  <th className="px-6 py-4 text-center font-serif text-lg">{locale === 'en' ? 'Base fee' : 'Frais de base'}</th>
+                  <th className="px-6 py-4 text-center font-serif text-lg">{locale === 'en' ? 'Est. delivery' : 'Délai estimé'}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -78,14 +80,14 @@ const ShippingInfo = () => {
                           </span>
                           {isCurrentZone && (
                             <span className="text-xs bg-ocean-teal text-primary-foreground px-2 py-0.5 rounded-full">
-                              Votre zone
+                              {locale === 'en' ? 'Your zone' : 'Votre zone'}
                             </span>
                           )}
                         </div>
                       </td>
                       <td className="px-6 py-4 text-center">
                         <span className={`font-semibold ${zone.baseCost === 0 ? 'text-ocean-teal' : 'text-foreground'}`}>
-                          {zone.baseCost === 0 ? 'Gratuit' : `${calculateShippingCost(zone)}€`}
+                          {zone.baseCost === 0 ? (locale === 'en' ? 'Free' : 'Gratuit') : formatPrice(calculateShippingCost(zone) * 119.33)}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center text-muted-foreground">
@@ -100,7 +102,9 @@ const ShippingInfo = () => {
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          * Les frais peuvent varier selon le poids et les dimensions du colis. Livraison gratuite en Polynésie Française.
+          {locale === 'en' 
+            ? '* Fees may vary depending on weight and dimensions. Free shipping in French Polynesia.'
+            : '* Les frais peuvent varier selon le poids et les dimensions du colis. Livraison gratuite en Polynésie Française.'}
         </p>
       </div>
     </section>

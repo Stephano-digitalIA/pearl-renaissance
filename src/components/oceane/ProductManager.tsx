@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/table';
 import { Plus, Pencil, Trash2, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLocale } from '@/contexts/LocaleContext';
 
 interface ProductManagerProps {
   open: boolean;
@@ -40,10 +41,11 @@ export const ProductManager = ({
 }: ProductManagerProps) => {
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
+  const { t, formatPrice } = useLocale();
 
   const handleAdd = (product: Omit<Product, 'id'>) => {
     addProduct(product);
-    toast.success('Produit ajouté avec succès');
+    toast.success(t('form.added'));
   };
 
   const handleEdit = (product: Product) => {
@@ -54,26 +56,22 @@ export const ProductManager = ({
   const handleUpdate = (product: Omit<Product, 'id'>) => {
     if (editingProduct) {
       updateProduct(editingProduct.id, product);
-      toast.success('Produit modifié');
+      toast.success(t('form.updated'));
       setEditingProduct(undefined);
     }
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Supprimer ce produit ?')) {
+    if (confirm(t('form.deleteConfirm'))) {
       deleteProduct(id);
-      toast.success('Produit supprimé');
+      toast.success(t('form.deleted'));
     }
   };
 
   const handleResetStorage = () => {
-    if (
-      confirm(
-        'Réinitialiser le catalogue ? Cela supprime les produits ajoutés localement et libère de la place de stockage.'
-      )
-    ) {
+    if (confirm(t('form.resetConfirm'))) {
       resetProductsStorage();
-      toast.success('Catalogue réinitialisé');
+      toast.success(t('form.resetDone'));
     }
   };
 
@@ -94,17 +92,17 @@ export const ProductManager = ({
           <DialogHeader>
             <DialogTitle className="font-serif text-xl flex items-center gap-2">
               <Package className="h-5 w-5" />
-              Gestion du Catalogue
+              {t('manager.title')}
             </DialogTitle>
           </DialogHeader>
           
           <div className="flex items-center justify-end gap-2 mb-4">
             <Button variant="outline" size="sm" onClick={handleResetStorage}>
-              Réinitialiser
+              {t('manager.reset')}
             </Button>
             <Button onClick={() => setFormOpen(true)} size="sm">
               <Plus className="h-4 w-4 mr-2" />
-              Ajouter un produit
+              {t('manager.add')}
             </Button>
           </div>
 
@@ -112,11 +110,11 @@ export const ProductManager = ({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[80px]">Image</TableHead>
-                  <TableHead>Nom</TableHead>
-                  <TableHead>Catégorie</TableHead>
-                  <TableHead className="text-right">Prix</TableHead>
-                  <TableHead className="w-[100px]">Actions</TableHead>
+                  <TableHead className="w-[80px]">{t('manager.image')}</TableHead>
+                  <TableHead>{t('manager.name')}</TableHead>
+                  <TableHead>{t('manager.category')}</TableHead>
+                  <TableHead className="text-right">{t('manager.price')}</TableHead>
+                  <TableHead className="w-[100px]">{t('manager.actions')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -132,7 +130,7 @@ export const ProductManager = ({
                     <TableCell className="font-medium">{product.name}</TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell className="text-right">
-                      {product.price.toLocaleString()} XPF
+                      {formatPrice(product.price)}
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-1">

@@ -11,6 +11,7 @@ import LocationBanner from '@/components/oceane/LocationBanner';
 import ShippingInfo from '@/components/oceane/ShippingInfo';
 import { ProductManager } from '@/components/oceane/ProductManager';
 import { useProducts } from '@/hooks/useProducts';
+import { useLocale } from '@/contexts/LocaleContext';
 import { testimonials, categories } from '@/data/oceaneData';
 import { Product } from '@/types/oceane';
 import { Button } from '@/components/ui/button';
@@ -18,6 +19,7 @@ import { Settings } from 'lucide-react';
 
 const Index = () => {
   const { products, addProduct, updateProduct, deleteProduct, resetProductsStorage } = useProducts();
+  const { t, locale } = useLocale();
   const [cart, setCart] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Tous');
@@ -34,6 +36,12 @@ const Index = () => {
 
   const removeFromCart = (indexToRemove: number) => {
     setCart(cart.filter((_, index) => index !== indexToRemove));
+  };
+
+  // Translate category names
+  const translateCategory = (cat: string) => {
+    if (cat === 'Tous') return locale === 'en' ? 'All' : 'Tous';
+    return cat;
   };
 
   return (
@@ -63,9 +71,9 @@ const Index = () => {
               <Settings className="h-5 w-5" />
             </Button>
             <span className="text-ocean-teal uppercase tracking-[0.2em] text-sm font-semibold">
-              Nos Créations
+              {t('collections.tagline')}
             </span>
-            <h2 className="font-serif text-4xl md:text-5xl mt-3 text-foreground">Les Collections</h2>
+            <h2 className="font-serif text-4xl md:text-5xl mt-3 text-foreground">{t('collections.title')}</h2>
             <div className="w-20 h-0.5 bg-sand-gold mx-auto mt-6"></div>
           </div>
 
@@ -81,7 +89,7 @@ const Index = () => {
                     : 'border-transparent text-muted-foreground hover:text-foreground'
                 }`}
               >
-                {cat}
+                {translateCategory(cat)}
               </button>
             ))}
           </div>
