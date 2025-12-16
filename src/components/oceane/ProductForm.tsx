@@ -57,7 +57,61 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
     }
   }, [open, initialData]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const compressImageToDataUrl = async (file: File) => {
+    // Goal: keep localStorage usage reasonable by resizing + JPEG compression.
+    // This prevents "QuotaExceededError" when products are persisted.
+    const TARGET_BYTES = 450 * 1024; // ~450KB
+    const MAX_DIM = 1600;
+
+    const objectUrl = URL.createObjectURL(file);
+    try {
+      const img = new Image();
+      img.decoding = 'async';
+      img.src = objectUrl;
+      await img.decode();
+
+      const scale = Math.min(1, MAX_DIM / Math.max(img.width, img.height));
+      let w = Math.max(1, Math.round(img.width * scale));
+      let h = Math.max(1, Math.round(img.height * scale));
+
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas unsupported');
+
+      let quality = 0.86;
+      for (let pass = 0; pass < 10; pass++) {
+        canvas.width = w;
+        canvas.height = h;
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(img, 0, 0, w, h);
+
+        const dataUrl = canvas.toDataURL('image/jpeg', quality);
+        // Approx bytes of base64 payload
+        const base64 = dataUrl.split(',')[1] || '';
+        const approxBytes = Math.floor((base64.length * 3) / 4);
+
+        if (approxBytes <= TARGET_BYTES) return dataUrl;
+
+        // First reduce quality, then reduce dimensions
+        if (quality > 0.55) {
+          quality = Math.max(0.55, quality - 0.08);
+        } else {
+          w = Math.max(1, Math.round(w * 0.85));
+          h = Math.max(1, Math.round(h * 0.85));
+        }
+      }
+
+      // Return last attempt even if bigger than target
+      canvas.width = w;
+      canvas.height = h;
+      ctx.drawImage(img, 0, 0, w, h);
+      return canvas.toDataURL('image/jpeg', Math.max(0.55, quality));
+    } finally {
+      URL.revokeObjectURL(objectUrl);
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
@@ -67,19 +121,26 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
       return;
     }
 
-    // Validate file size (max 6MB for localStorage)
+    // Validate file size (max 6MB input)
     if (file.size > 6 * 1024 * 1024) {
       toast.error('Image trop grande (max 6MB)');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      const base64 = reader.result as string;
-      setFormData(prev => ({ ...prev, image: base64 }));
-      setImagePreview(base64);
-    };
-    reader.readAsDataURL(file);
+    try {
+      const optimized = await compressImageToDataUrl(file);
+      setFormData((prev) => ({ ...prev, image: optimized }));
+      setImagePreview(optimized);
+    } catch {
+      // Fallback to original base64 if compression fails
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = reader.result as string;
+        setFormData((prev) => ({ ...prev, image: base64 }));
+        setImagePreview(base64);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleUrlChange = (url: string) => {
