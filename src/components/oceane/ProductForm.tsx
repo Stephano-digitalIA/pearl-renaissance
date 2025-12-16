@@ -101,22 +101,39 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
       toast.error('Veuillez ajouter une image');
       return;
     }
-    onSubmit({
-      name: formData.name.trim(),
-      category: formData.category,
-      price: parseFloat(formData.price) || 0,
-      image: formData.image.trim(),
-      description: formData.description.trim(),
-    });
-    onClose();
-    setFormData({
-      name: '',
-      category: productCategories[0],
-      price: '',
-      image: '',
-      description: '',
-    });
-    setImagePreview('');
+
+    try {
+      onSubmit({
+        name: formData.name.trim(),
+        category: formData.category,
+        price: parseFloat(formData.price) || 0,
+        image: formData.image.trim(),
+        description: formData.description.trim(),
+      });
+
+      onClose();
+      setFormData({
+        name: '',
+        category: productCategories[0],
+        price: '',
+        image: '',
+        description: '',
+      });
+      setImagePreview('');
+    } catch (err: any) {
+      const message = String(err?.message || err);
+      const isQuota =
+        err?.name === 'QuotaExceededError' ||
+        /quota/i.test(message) ||
+        /exceeded/i.test(message) ||
+        /localstorage/i.test(message);
+
+      toast.error(
+        isQuota
+          ? "Stockage du navigateur saturé. Essayez une image plus légère (ou supprimez d'anciens produits)."
+          : "Impossible d'ajouter le produit. Réessayez."
+      );
+    }
   };
 
   return (

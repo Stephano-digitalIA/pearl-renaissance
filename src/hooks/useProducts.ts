@@ -21,7 +21,13 @@ export const useProducts = () => {
 
   const saveProducts = (newProducts: Product[]) => {
     setProducts(newProducts);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(newProducts));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(newProducts));
+    } catch (err) {
+      // Most common cause: browser storage quota exceeded (base64 images are large)
+      console.error('Failed to persist products to localStorage', err);
+      throw err;
+    }
   };
 
   const addProduct = (product: Omit<Product, 'id'>) => {
