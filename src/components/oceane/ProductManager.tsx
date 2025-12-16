@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useProducts } from '@/hooks/useProducts';
 import { ProductForm } from './ProductForm';
 import { Product } from '@/types/oceane';
 import { Button } from '@/components/ui/button';
@@ -23,10 +22,22 @@ import { toast } from 'sonner';
 interface ProductManagerProps {
   open: boolean;
   onClose: () => void;
+  products: Product[];
+  addProduct: (product: Omit<Product, 'id'>) => Product;
+  updateProduct: (id: number, updates: Partial<Product>) => void;
+  deleteProduct: (id: number) => void;
+  resetProductsStorage: () => void;
 }
 
-export const ProductManager = ({ open, onClose }: ProductManagerProps) => {
-  const { products, addProduct, updateProduct, deleteProduct, resetProductsStorage } = useProducts();
+export const ProductManager = ({
+  open,
+  onClose,
+  products,
+  addProduct,
+  updateProduct,
+  deleteProduct,
+  resetProductsStorage,
+}: ProductManagerProps) => {
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
