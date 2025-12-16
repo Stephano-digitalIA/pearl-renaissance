@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@200;300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,43 +6,44 @@
 
 @layer base {
   :root {
-    --background: 210 20% 98%;
-    --foreground: 215 28% 17%;
+    --background: 0 0% 100%;
+    --foreground: 150 25% 20%;
 
     --card: 0 0% 100%;
-    --card-foreground: 215 28% 17%;
+    --card-foreground: 150 25% 20%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 28% 17%;
+    --popover-foreground: 150 25% 20%;
 
-    --primary: 174 70% 21%;
+    --primary: 150 40% 28%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 215 28% 17%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 45 70% 50%;
+    --secondary-foreground: 150 25% 20%;
 
-    --muted: 210 20% 96%;
-    --muted-foreground: 215 16% 47%;
+    --muted: 150 10% 96%;
+    --muted-foreground: 150 10% 45%;
 
-    --accent: 43 76% 52%;
-    --accent-foreground: 215 28% 17%;
+    --accent: 45 70% 50%;
+    --accent-foreground: 150 25% 20%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;
-    --input: 214 32% 91%;
-    --ring: 174 70% 21%;
+    --border: 150 10% 90%;
+    --input: 150 10% 90%;
+    --ring: 150 40% 28%;
 
     --radius: 0.5rem;
 
-    /* Custom colors */
-    --ocean-dark: 215 28% 17%;
-    --ocean-teal: 174 70% 21%;
-    --pearl-black: 0 0% 10%;
-    --pearl-grey: 215 14% 34%;
-    --sand-gold: 43 76% 52%;
-    --sand-light: 210 20% 98%;
+    /* Custom brand colors */
+    --brand-green: 150 40% 28%;
+    --brand-green-light: 150 30% 40%;
+    --brand-green-dark: 150 50% 18%;
+    --brand-gold: 45 70% 50%;
+    --brand-gold-light: 45 60% 70%;
+    --brand-cream: 45 30% 96%;
+    --brand-dark: 150 25% 15%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -55,33 +56,33 @@
   }
 
   .dark {
-    --background: 215 28% 17%;
-    --foreground: 210 20% 98%;
+    --background: 150 25% 10%;
+    --foreground: 0 0% 98%;
 
-    --card: 215 28% 12%;
-    --card-foreground: 210 20% 98%;
+    --card: 150 25% 12%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 215 28% 12%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 150 25% 12%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 174 70% 30%;
+    --primary: 150 40% 35%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 45 70% 50%;
+    --secondary-foreground: 150 25% 10%;
 
-    --muted: 217 33% 17%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 150 20% 18%;
+    --muted-foreground: 150 10% 60%;
 
-    --accent: 43 76% 52%;
-    --accent-foreground: 215 28% 17%;
+    --accent: 45 70% 50%;
+    --accent-foreground: 150 25% 10%;
 
     --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217 33% 17%;
-    --input: 217 33% 17%;
-    --ring: 174 70% 30%;
+    --border: 150 20% 20%;
+    --input: 150 20% 20%;
+    --ring: 150 40% 35%;
   }
 }
 
@@ -102,19 +103,19 @@
     background: hsl(var(--muted));
   }
   ::-webkit-scrollbar-thumb {
-    background: hsl(var(--ocean-teal));
+    background: hsl(var(--primary));
     border-radius: 4px;
   }
 
   ::selection {
-    background: hsl(var(--ocean-teal));
+    background: hsl(var(--primary));
     color: white;
   }
 }
 
 @layer utilities {
   .animate-fade-in {
-    animation: fadeIn 1s ease-out;
+    animation: fadeIn 0.6s ease-out;
   }
 
   .animate-fade-in-up {
@@ -131,10 +132,7 @@
     to { opacity: 1; transform: translateY(0); }
   }
 
-  .hero-bg {
-    background-image: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.4)), url('https://images.unsplash.com/photo-1596525727764-106c55977ba2?q=80&w=2070&auto=format&fit=crop'); 
-    background-size: cover;
-    background-position: center;
-    background-attachment: fixed;
+  .hero-gradient {
+    background: linear-gradient(135deg, hsl(var(--brand-green)) 0%, hsl(var(--brand-green-dark)) 100%);
   }
 }

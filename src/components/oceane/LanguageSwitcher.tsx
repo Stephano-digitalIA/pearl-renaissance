@@ -33,12 +33,12 @@ export const LanguageSwitcher = () => {
     <div className="flex items-center gap-1">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="gap-1.5 text-sm px-2">
+          <Button variant="ghost" size="sm" className="gap-1.5 text-sm px-2 text-inherit hover:bg-primary-foreground/10">
             <Globe className="h-4 w-4" />
             <span className="hidden sm:inline">{current.flag}</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-background z-50 max-h-80 overflow-y-auto">
+        <DropdownMenuContent align="end" className="bg-background text-foreground z-50 max-h-80 overflow-y-auto">
           {languages.map((lang) => (
             <DropdownMenuItem
               key={lang.code}
@@ -53,11 +53,11 @@ export const LanguageSwitcher = () => {
       </DropdownMenu>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm" className="text-sm px-2">
+          <Button variant="ghost" size="sm" className="text-sm px-2 text-inherit hover:bg-primary-foreground/10">
             {currency}
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="bg-background z-50">
+        <DropdownMenuContent align="end" className="bg-background text-foreground z-50">
           {currencies.map((cur) => (
             <DropdownMenuItem
               key={cur.code}
