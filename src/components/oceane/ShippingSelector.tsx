@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { Check, Truck, MapPin, User, Building } from 'lucide-react';
+import { Check, Truck, MapPin, User, Building, Gift } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useUserProfile } from '@/contexts/UserProfileContext';
 import { 
-  shippingCarriers, 
   ShippingCarrier, 
   getZoneFromCountry,
-  calculateCarrierShippingCost 
+  calculateCarrierShippingCost,
+  getAvailableCarriers,
+  isTahitiOrMoorea
 } from '@/types/shippingCarriers';
 import {
   Select,
@@ -20,7 +21,7 @@ import { Input } from "@/components/ui/input";
 
 interface ShippingSelectorProps {
   orderTotal: number;
-  onShippingSelect: (carrier: ShippingCarrier, cost: number) => void;
+  onShippingSelect: (carrier: ShippingCarrier | null, cost: number) => void;
   selectedCarrierId?: string;
 }
 
@@ -45,6 +46,15 @@ const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: S
   }, [shippingCountryCode, shippingCity]);
   
   const zone = getZoneFromCountry(destinationCountry);
+  const availableCarriers = getAvailableCarriers(destinationCountry, destinationCity);
+  const isFreeLocalDelivery = destinationCountry === 'PF' && isTahitiOrMoorea(destinationCity);
+
+  // Auto-select free delivery for Tahiti/Moorea
+  useEffect(() => {
+    if (isFreeLocalDelivery) {
+      onShippingSelect(null, 0);
+    }
+  }, [isFreeLocalDelivery, onShippingSelect]);
   
   const countries = [
     { code: 'PF', name: 'Polynésie Française' },
@@ -127,67 +137,80 @@ const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: S
         </Select>
       </div>
 
+      {/* Free delivery message for Tahiti/Moorea */}
+      {isFreeLocalDelivery && destinationCity && (
+        <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 flex items-center gap-3">
+          <Gift className="w-5 h-5 text-green-600" />
+          <div>
+            <p className="font-medium text-green-700 dark:text-green-400">
+              {t('cart.freeLocalDelivery')}
+            </p>
+            <p className="text-sm text-green-600 dark:text-green-500">
+              Tahiti & Moorea
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Carriers list */}
-      <div className="space-y-2">
-        <label className="flex items-center gap-2 text-sm font-medium text-foreground">
-          <Truck className="w-4 h-4" />
-          {t('cart.selectCarrier')}
-        </label>
+      {!isFreeLocalDelivery && availableCarriers.length > 0 && (
         <div className="space-y-2">
-          {shippingCarriers.map((carrier) => {
-            const { cost, isFree } = calculateCarrierShippingCost(carrier, zone, orderTotal, destinationCountry, destinationCity);
-            const isSelected = selectedCarrierId === carrier.id;
-            const deliveryDays = carrier.deliveryDays[zone];
-            
-            return (
-              <button
-                key={carrier.id}
-                onClick={() => handleCarrierSelect(carrier)}
-                className={`w-full p-3 rounded-lg border transition-all text-left ${
-                  isSelected 
-                    ? 'border-primary bg-primary/5 ring-1 ring-primary' 
-                    : 'border-border hover:border-primary/50 bg-background'
-                }`}
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl">{carrier.logo}</span>
-                    <div>
-                      <p className="font-medium text-foreground">{carrier.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {deliveryDays} {t('cart.days')}
-                      </p>
+          <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+            <Truck className="w-4 h-4" />
+            {t('cart.selectCarrier')}
+          </label>
+          <div className="space-y-2">
+            {availableCarriers.map((carrier) => {
+              const { cost } = calculateCarrierShippingCost(carrier, zone, orderTotal, destinationCountry, destinationCity);
+              const isSelected = selectedCarrierId === carrier.id;
+              const deliveryDays = carrier.deliveryDays[zone];
+              
+              return (
+                <button
+                  key={carrier.id}
+                  onClick={() => handleCarrierSelect(carrier)}
+                  className={`w-full p-3 rounded-lg border transition-all text-left ${
+                    isSelected 
+                      ? 'border-primary bg-primary/5 ring-1 ring-primary' 
+                      : 'border-border hover:border-primary/50 bg-background'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <span className="text-2xl">{carrier.logo}</span>
+                      <div>
+                        <p className="font-medium text-foreground">{carrier.name}</p>
+                        {deliveryDays && (
+                          <p className="text-xs text-muted-foreground">
+                            {deliveryDays} {t('cart.days')}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <div className="text-right">
-                      {isFree ? (
-                        <span className="text-green-600 font-semibold text-sm">
-                          {t('cart.freeShipping')}
-                        </span>
-                      ) : (
-                        <span className="font-semibold text-foreground">
-                          {formatPrice(cost)}
-                        </span>
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-foreground">
+                        {formatPrice(cost)}
+                      </span>
+                      {isSelected && (
+                        <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
+                          <Check className="w-3 h-3 text-primary-foreground" />
+                        </div>
                       )}
                     </div>
-                    {isSelected && (
-                      <div className="w-5 h-5 rounded-full bg-primary flex items-center justify-center">
-                        <Check className="w-3 h-3 text-primary-foreground" />
-                      </div>
-                    )}
                   </div>
-                </div>
-                {!isFree && carrier.freeShippingThreshold > orderTotal && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    {t('cart.freeFrom')} {formatPrice(carrier.freeShippingThreshold)}
-                  </p>
-                )}
-              </button>
-            );
-          })}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* No city entered for Polynesia */}
+      {destinationCountry === 'PF' && !destinationCity && (
+        <p className="text-sm text-muted-foreground italic">
+          {t('cart.enterCityForShipping')}
+        </p>
+      )}
     </div>
   );
 };
