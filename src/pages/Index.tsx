@@ -17,7 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Settings } from 'lucide-react';
 
 const Index = () => {
-  const { products } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, resetProductsStorage } = useProducts();
   const [cart, setCart] = useState<Product[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState('Tous');
@@ -101,7 +101,15 @@ const Index = () => {
       </main>
 
       <Footer />
-      <ProductManager open={isManagerOpen} onClose={() => setIsManagerOpen(false)} />
+      <ProductManager
+        open={isManagerOpen}
+        onClose={() => setIsManagerOpen(false)}
+        products={products}
+        addProduct={addProduct}
+        updateProduct={updateProduct}
+        deleteProduct={deleteProduct}
+        resetProductsStorage={resetProductsStorage}
+      />
     </div>
   );
 };
