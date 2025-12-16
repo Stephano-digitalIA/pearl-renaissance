@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { ShoppingBag, Menu, Search, X } from 'lucide-react';
+import { ShoppingBag, Menu, Search } from 'lucide-react';
+import { useLocale } from '@/contexts/LocaleContext';
+import { LanguageSwitcher } from './LanguageSwitcher';
 
 interface NavbarProps {
   cartCount: number;
@@ -9,6 +11,7 @@ interface NavbarProps {
 const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { t } = useLocale();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -28,12 +31,13 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
         </div>
         
         <div className="hidden md:flex space-x-8 text-sm tracking-wide font-medium uppercase">
-          <a href="#collections" className="hover:text-sand-gold transition-colors">Collections</a>
-          <a href="#histoire" className="hover:text-sand-gold transition-colors">L'Histoire</a>
-          <a href="#atelier" className="hover:text-sand-gold transition-colors">L'Atelier</a>
+          <a href="#collections" className="hover:text-sand-gold transition-colors">{t('nav.collections')}</a>
+          <a href="#histoire" className="hover:text-sand-gold transition-colors">{t('nav.story')}</a>
+          <a href="#atelier" className="hover:text-sand-gold transition-colors">{t('nav.workshop')}</a>
         </div>
 
-        <div className="flex items-center space-x-6">
+        <div className="flex items-center space-x-4">
+          <LanguageSwitcher />
           <Search className="w-5 h-5 cursor-pointer hover:text-sand-gold transition-colors hidden sm:block" />
           <div className="relative cursor-pointer" onClick={() => setIsCartOpen(true)}>
             <ShoppingBag className="w-5 h-5 hover:text-sand-gold transition-colors" />
@@ -54,9 +58,9 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
       {mobileMenuOpen && (
         <div className="absolute top-full left-0 w-full bg-card text-foreground shadow-lg py-4 md:hidden animate-fade-in">
           <div className="flex flex-col items-center space-y-4 font-serif text-lg">
-            <a href="#collections" onClick={() => setMobileMenuOpen(false)}>Collections</a>
-            <a href="#histoire" onClick={() => setMobileMenuOpen(false)}>L'Histoire</a>
-            <a href="#atelier" onClick={() => setMobileMenuOpen(false)}>L'Atelier</a>
+            <a href="#collections" onClick={() => setMobileMenuOpen(false)}>{t('nav.collections')}</a>
+            <a href="#histoire" onClick={() => setMobileMenuOpen(false)}>{t('nav.story')}</a>
+            <a href="#atelier" onClick={() => setMobileMenuOpen(false)}>{t('nav.workshop')}</a>
           </div>
         </div>
       )}

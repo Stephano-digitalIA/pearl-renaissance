@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/dialog';
 import { Upload, Link, X } from 'lucide-react';
 import { toast } from 'sonner';
+import { useLocale } from '@/contexts/LocaleContext';
 
 interface ProductFormProps {
   open: boolean;
@@ -31,6 +32,7 @@ interface ProductFormProps {
 const productCategories = categories.filter(c => c !== 'Tous');
 
 export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFormProps) => {
+  const { t } = useLocale();
   const [formData, setFormData] = useState({
     name: initialData?.name || '',
     category: initialData?.category || productCategories[0],
@@ -58,9 +60,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
   }, [open, initialData]);
 
   const compressImageToDataUrl = async (file: File) => {
-    // Goal: keep localStorage usage reasonable by resizing + JPEG compression.
-    // This prevents "QuotaExceededError" when products are persisted.
-    const TARGET_BYTES = 450 * 1024; // ~450KB
+    const TARGET_BYTES = 450 * 1024;
     const MAX_DIM = 1600;
 
     const objectUrl = URL.createObjectURL(file);
@@ -86,13 +86,11 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
         ctx.drawImage(img, 0, 0, w, h);
 
         const dataUrl = canvas.toDataURL('image/jpeg', quality);
-        // Approx bytes of base64 payload
         const base64 = dataUrl.split(',')[1] || '';
         const approxBytes = Math.floor((base64.length * 3) / 4);
 
         if (approxBytes <= TARGET_BYTES) return dataUrl;
 
-        // First reduce quality, then reduce dimensions
         if (quality > 0.55) {
           quality = Math.max(0.55, quality - 0.08);
         } else {
@@ -101,7 +99,6 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
         }
       }
 
-      // Return last attempt even if bigger than target
       canvas.width = w;
       canvas.height = h;
       ctx.drawImage(img, 0, 0, w, h);
@@ -115,15 +112,13 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Validate file type
     if (!file.type.startsWith('image/')) {
-      toast.error('Veuillez sélectionner une image');
+      toast.error(t('form.imageTypeError'));
       return;
     }
 
-    // Validate file size (max 6MB input)
     if (file.size > 6 * 1024 * 1024) {
-      toast.error('Image trop grande (max 6MB)');
+      toast.error(t('form.imageSizeError'));
       return;
     }
 
@@ -132,7 +127,6 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
       setFormData((prev) => ({ ...prev, image: optimized }));
       setImagePreview(optimized);
     } catch {
-      // Fallback to original base64 if compression fails
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64 = reader.result as string;
@@ -159,7 +153,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.image) {
-      toast.error('Veuillez ajouter une image');
+      toast.error(t('form.imageRequired'));
       return;
     }
 
@@ -189,11 +183,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
         /exceeded/i.test(message) ||
         /localstorage/i.test(message);
 
-      toast.error(
-        isQuota
-          ? "Stockage du navigateur saturé. Essayez une image plus légère (ou supprimez d'anciens produits)."
-          : "Impossible d'ajouter le produit. Réessayez."
-      );
+      toast.error(isQuota ? t('form.storageError') : t('form.genericError'));
     }
   };
 
@@ -207,24 +197,24 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
       <DialogContent className="sm:max-w-[500px] bg-background">
         <DialogHeader>
           <DialogTitle className="font-serif text-xl">
-            {initialData ? 'Modifier le produit' : 'Ajouter un produit'}
+            {initialData ? t('form.editTitle') : t('form.addTitle')}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Nom du produit</Label>
+            <Label htmlFor="name">{t('form.productName')}</Label>
             <Input
               id="name"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Ex: Larme du Lagon"
+              placeholder={t('form.productNamePlaceholder')}
               required
               maxLength={100}
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category">Catégorie</Label>
+            <Label htmlFor="category">{t('form.category')}</Label>
             <Select
               value={formData.category}
               onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
@@ -243,7 +233,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="price">Prix (XPF)</Label>
+            <Label htmlFor="price">{t('form.price')} (XPF)</Label>
             <Input
               id="price"
               type="number"
@@ -257,7 +247,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
           </div>
 
           <div className="space-y-2">
-            <Label>Image du produit</Label>
+            <Label>{t('form.image')}</Label>
             <div className="flex gap-2 mb-2">
               <Button
                 type="button"
@@ -266,7 +256,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
                 onClick={() => setImageMode('upload')}
               >
                 <Upload className="h-4 w-4 mr-1" />
-                Upload
+                {t('form.upload')}
               </Button>
               <Button
                 type="button"
@@ -275,7 +265,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
                 onClick={() => setImageMode('url')}
               >
                 <Link className="h-4 w-4 mr-1" />
-                URL
+                {t('form.url')}
               </Button>
             </div>
 
@@ -293,9 +283,9 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
                 />
                 <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
-                  Cliquez pour sélectionner une image
+                  {t('form.uploadHint')}
                 </p>
-                <p className="text-xs text-muted-foreground mt-1">Max 6MB</p>
+                <p className="text-xs text-muted-foreground mt-1">{t('form.maxSize')}</p>
               </div>
             ) : (
               <Input
@@ -328,12 +318,12 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">{t('form.description')}</Label>
             <Textarea
               id="description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Description du bijou..."
+              placeholder={t('form.descriptionPlaceholder')}
               rows={3}
               maxLength={500}
             />
@@ -341,10 +331,10 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
 
           <div className="flex justify-end gap-3 pt-4">
             <Button type="button" variant="outline" onClick={onClose}>
-              Annuler
+              {t('form.cancel')}
             </Button>
             <Button type="submit">
-              {initialData ? 'Enregistrer' : 'Ajouter'}
+              {initialData ? t('form.save') : t('form.add')}
             </Button>
           </div>
         </form>
