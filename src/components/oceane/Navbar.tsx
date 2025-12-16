@@ -32,11 +32,8 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
     <header className="sticky top-0 z-50 bg-background border-b border-border">
       {/* Top bar */}
       <div className="bg-primary text-primary-foreground py-2">
-        <div className="container mx-auto px-4 flex justify-between items-center text-sm">
-          <span className="hidden sm:block">{t('shipping.free')}</span>
-          <div className="flex items-center gap-4 mx-auto sm:mx-0">
-            <LanguageSwitcher />
-          </div>
+        <div className="container mx-auto px-4 flex justify-center items-center">
+          <LanguageSwitcher />
         </div>
       </div>
 
