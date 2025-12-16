@@ -1,6 +1,12 @@
-import { Heart } from 'lucide-react';
+import { Heart, Info } from 'lucide-react';
 import { Product } from '@/types/oceane';
 import { useLocale } from '@/contexts/LocaleContext';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 
 interface ProductCardProps {
   product: Product;
@@ -30,9 +36,23 @@ const ProductCard = ({ product, addToCart }: ProductCardProps) => {
       </div>
       <div className="px-4 text-center">
         <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{product.category}</p>
-        <h3 className="font-serif text-xl text-foreground mb-2 group-hover:text-sand-gold transition-colors">
-          {product.name}
-        </h3>
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <h3 className="font-serif text-xl text-foreground group-hover:text-sand-gold transition-colors">
+            {product.name}
+          </h3>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button className="text-muted-foreground hover:text-foreground transition-colors">
+                  <Info className="w-4 h-4" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>{product.description}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <p className="font-medium text-foreground">{formatPrice(product.price)}</p>
       </div>
     </div>
