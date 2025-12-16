@@ -5,6 +5,7 @@ interface UserProfileContextType {
   profile: UserProfile;
   updateProfile: (profile: UserProfile) => void;
   shippingCountryCode: string;
+  shippingCity: string;
 }
 
 const UserProfileContext = createContext<UserProfileContextType | undefined>(undefined);
@@ -29,8 +30,12 @@ export const UserProfileProvider = ({ children }: { children: ReactNode }) => {
     ? profile.postalAddress.countryCode 
     : profile.shippingAddress.countryCode;
 
+  const shippingCity = profile.usePostalAsShipping 
+    ? profile.postalAddress.city 
+    : profile.shippingAddress.city;
+
   return (
-    <UserProfileContext.Provider value={{ profile, updateProfile, shippingCountryCode }}>
+    <UserProfileContext.Provider value={{ profile, updateProfile, shippingCountryCode, shippingCity }}>
       {children}
     </UserProfileContext.Provider>
   );

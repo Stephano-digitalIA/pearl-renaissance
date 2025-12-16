@@ -188,13 +188,72 @@ export const getZoneFromCountry = (countryCode: string): ShippingZoneKey => {
   return countryToZone[countryCode] || 'world';
 };
 
+// City-based surcharges (in XPF) - remote/rural areas have higher fees
+export const citySurcharges: Record<string, Record<string, number>> = {
+  FR: {
+    // Major French cities - no surcharge
+    'paris': 0, 'lyon': 0, 'marseille': 0, 'toulouse': 0, 'nice': 0, 'nantes': 0, 'strasbourg': 0, 'bordeaux': 0, 'lille': 0, 'montpellier': 0,
+    // Remote areas - small surcharge
+    '_default': 300,
+  },
+  US: {
+    // Major US cities - no surcharge
+    'new york': 0, 'los angeles': 0, 'chicago': 0, 'houston': 0, 'phoenix': 0, 'san francisco': 0, 'miami': 0, 'seattle': 0, 'boston': 0, 'denver': 0,
+    // Alaska, Hawaii - higher surcharge
+    'anchorage': 1500, 'honolulu': 1200,
+    '_default': 400,
+  },
+  DE: {
+    'berlin': 0, 'munich': 0, 'hamburg': 0, 'frankfurt': 0, 'cologne': 0, 'düsseldorf': 0, 'stuttgart': 0,
+    '_default': 250,
+  },
+  JP: {
+    'tokyo': 0, 'osaka': 0, 'kyoto': 0, 'yokohama': 0, 'nagoya': 0, 'sapporo': 0, 'kobe': 0, 'fukuoka': 0,
+    '_default': 400,
+  },
+  AU: {
+    'sydney': 0, 'melbourne': 0, 'brisbane': 0, 'perth': 0, 'adelaide': 0,
+    '_default': 600,
+  },
+  CA: {
+    'toronto': 0, 'montreal': 0, 'vancouver': 0, 'calgary': 0, 'ottawa': 0,
+    '_default': 500,
+  },
+  PF: {
+    'papeete': 0, 'faaa': 0, 'punaauia': 0, 'pirae': 0, 'arue': 0,
+    // Remote islands - higher surcharge
+    '_default': 800,
+  },
+};
+
+export const getCitySurcharge = (countryCode: string, city: string): number => {
+  const countrySurcharges = citySurcharges[countryCode];
+  if (!countrySurcharges) return 0;
+  
+  const normalizedCity = city.toLowerCase().trim();
+  const surcharge = countrySurcharges[normalizedCity];
+  
+  if (surcharge !== undefined) return surcharge;
+  return countrySurcharges['_default'] || 0;
+};
+
 export const calculateCarrierShippingCost = (
   carrier: ShippingCarrier,
   zone: ShippingZoneKey,
-  orderTotal: number
+  orderTotal: number,
+  countryCode?: string,
+  city?: string
 ): { cost: number; isFree: boolean } => {
   if (orderTotal >= carrier.freeShippingThreshold) {
     return { cost: 0, isFree: true };
   }
-  return { cost: carrier.baseRates[zone], isFree: false };
+  
+  let baseCost = carrier.baseRates[zone];
+  
+  // Add city surcharge if applicable
+  if (countryCode && city) {
+    baseCost += getCitySurcharge(countryCode, city);
+  }
+  
+  return { cost: baseCost, isFree: false };
 };

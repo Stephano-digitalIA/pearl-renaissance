@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { Check, Truck, MapPin, User } from 'lucide-react';
+import { Check, Truck, MapPin, User, Building } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useLocale } from '@/contexts/LocaleContext';
 import { useUserProfile } from '@/contexts/UserProfileContext';
 import { 
   shippingCarriers, 
   ShippingCarrier, 
-  ShippingZoneKey, 
   getZoneFromCountry,
   calculateCarrierShippingCost 
 } from '@/types/shippingCarriers';
@@ -17,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 interface ShippingSelectorProps {
   orderTotal: number;
@@ -26,19 +26,23 @@ interface ShippingSelectorProps {
 
 const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: ShippingSelectorProps) => {
   const { formatPrice, t, countryCode } = useLocale();
-  const { shippingCountryCode } = useUserProfile();
+  const { shippingCountryCode, shippingCity } = useUserProfile();
   
-  // Use profile shipping country if set, otherwise fallback to detected country
+  // Use profile shipping country/city if set, otherwise fallback to detected country
   const [destinationCountry, setDestinationCountry] = useState(
     shippingCountryCode || countryCode || 'FR'
   );
+  const [destinationCity, setDestinationCity] = useState(shippingCity || '');
   
-  // Update when profile shipping country changes
+  // Update when profile shipping address changes
   useEffect(() => {
     if (shippingCountryCode) {
       setDestinationCountry(shippingCountryCode);
     }
-  }, [shippingCountryCode]);
+    if (shippingCity) {
+      setDestinationCity(shippingCity);
+    }
+  }, [shippingCountryCode, shippingCity]);
   
   const zone = getZoneFromCountry(destinationCountry);
   
@@ -70,14 +74,14 @@ const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: S
   };
 
   const handleCarrierSelect = (carrier: ShippingCarrier) => {
-    const { cost } = calculateCarrierShippingCost(carrier, zone, orderTotal);
+    const { cost } = calculateCarrierShippingCost(carrier, zone, orderTotal, destinationCountry, destinationCity);
     onShippingSelect(carrier, cost);
   };
 
   return (
     <div className="space-y-4">
       {/* Profile shipping address indicator */}
-      {shippingCountryCode && (
+      {shippingCountryCode && shippingCity && (
         <div className="bg-primary/10 rounded-lg p-3 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-foreground">
             <User className="w-4 h-4" />
@@ -89,6 +93,20 @@ const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: S
         </div>
       )}
       
+      {/* City input */}
+      <div className="space-y-2">
+        <label className="flex items-center gap-2 text-sm font-medium text-foreground">
+          <Building className="w-4 h-4" />
+          {t('cart.city')}
+        </label>
+        <Input
+          value={destinationCity}
+          onChange={(e) => setDestinationCity(e.target.value)}
+          placeholder={t('cart.cityPlaceholder')}
+          className="bg-background border-border"
+        />
+      </div>
+
       {/* Destination selection */}
       <div className="space-y-2">
         <label className="flex items-center gap-2 text-sm font-medium text-foreground">
@@ -117,7 +135,7 @@ const ShippingSelector = ({ orderTotal, onShippingSelect, selectedCarrierId }: S
         </label>
         <div className="space-y-2">
           {shippingCarriers.map((carrier) => {
-            const { cost, isFree } = calculateCarrierShippingCost(carrier, zone, orderTotal);
+            const { cost, isFree } = calculateCarrierShippingCost(carrier, zone, orderTotal, destinationCountry, destinationCity);
             const isSelected = selectedCarrierId === carrier.id;
             const deliveryDays = carrier.deliveryDays[zone];
             
