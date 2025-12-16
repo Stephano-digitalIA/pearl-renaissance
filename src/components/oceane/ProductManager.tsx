@@ -73,7 +73,12 @@ export const ProductManager = ({ open, onClose }: ProductManagerProps) => {
 
   return (
     <>
-      <Dialog open={open} onOpenChange={onClose}>
+      <Dialog
+        open={open}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) onClose();
+        }}
+      >
         <DialogContent className="sm:max-w-[900px] max-h-[80vh] overflow-hidden bg-background">
           <DialogHeader>
             <DialogTitle className="font-serif text-xl flex items-center gap-2">
