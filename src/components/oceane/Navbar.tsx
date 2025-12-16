@@ -26,8 +26,8 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
         : 'bg-transparent py-6 text-primary-foreground'
     }`}>
       <div className="container mx-auto px-6 flex justify-between items-center">
-        <div className="text-2xl font-serif font-bold tracking-widest cursor-pointer">
-          OCÉANE
+        <div className="text-xl font-serif font-bold tracking-widest cursor-pointer">
+          DEESSEDIAMS RENAISSANCE
         </div>
         
         <div className="hidden md:flex space-x-8 text-sm tracking-wide font-medium uppercase">

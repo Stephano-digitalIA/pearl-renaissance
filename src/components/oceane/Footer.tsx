@@ -8,7 +8,7 @@ const Footer = () => {
     <footer className="bg-ocean-dark text-primary-foreground pt-20 pb-10">
       <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-12 border-b border-gray-800 pb-12 mb-12">
         <div className="col-span-1 md:col-span-1">
-          <div className="text-3xl font-serif font-bold tracking-widest mb-6">OCÉANE</div>
+          <div className="text-2xl font-serif font-bold tracking-widest mb-6">DEESSEDIAMS RENAISSANCE</div>
           <p className="text-gray-400 text-sm leading-relaxed mb-6">
             L'essence pure de la Polynésie. Des bijoux créés avec passion, authenticité et respect de la nature.
           </p>
@@ -55,7 +55,7 @@ const Footer = () => {
         </div>
       </div>
       <div className="text-center text-gray-600 text-xs">
-        &copy; 2024 Océane Perles. {t('footer.rights')}.
+        &copy; 2024 DEESSEDIAMS RENAISSANCE. {t('footer.rights')}.
       </div>
     </footer>
   );
