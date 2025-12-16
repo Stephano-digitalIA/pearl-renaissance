@@ -11,6 +11,12 @@ import { Globe } from 'lucide-react';
 const languages: { code: Locale; label: string; flag: string }[] = [
   { code: 'fr', label: 'Français', flag: '🇫🇷' },
   { code: 'en', label: 'English', flag: '🇬🇧' },
+  { code: 'es', label: 'Español', flag: '🇪🇸' },
+  { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
+  { code: 'it', label: 'Italiano', flag: '🇮🇹' },
+  { code: 'pt', label: 'Português', flag: '🇵🇹' },
+  { code: 'nl', label: 'Nederlands', flag: '🇳🇱' },
+  { code: 'ja', label: '日本語', flag: '🇯🇵' },
 ];
 
 export const LanguageSwitcher = () => {
@@ -25,7 +31,7 @@ export const LanguageSwitcher = () => {
           <span className="hidden sm:inline">{current.flag} {currency}</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-background z-50">
+      <DropdownMenuContent align="end" className="bg-background z-50 max-h-80 overflow-y-auto">
         {languages.map((lang) => (
           <DropdownMenuItem
             key={lang.code}
