@@ -1,4 +1,5 @@
 import { useLocale } from '@/contexts/LocaleContext';
+import pearlCraftsman from '@/assets/pearl-craftsman.png';
 
 const StorySection = () => {
   const { t } = useLocale();
@@ -9,8 +10,8 @@ const StorySection = () => {
         <div className="order-2 md:order-1 relative">
           <div className="absolute -top-10 -left-10 w-24 h-24 border-t-2 border-l-2 border-sand-gold opacity-50"></div>
           <img 
-            src="https://images.unsplash.com/photo-1576495149368-0d195f1909a3?q=80&w=1000&auto=format&fit=crop" 
-            alt="Pearl Harvesting" 
+            src={pearlCraftsman} 
+            alt="Pearl Harvesting"
             className="w-full h-[500px] object-cover filter brightness-75 hover:brightness-100 transition-all duration-500"
           />
           <div className="absolute -bottom-10 -right-10 w-24 h-24 border-b-2 border-r-2 border-sand-gold opacity-50"></div>
