@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, Menu, Search, User } from 'lucide-react';
+import { ShoppingBag, Menu, Search, User, Settings } from 'lucide-react';
 import { useLocale } from '@/contexts/LocaleContext';
 import { LanguageSwitcher } from './LanguageSwitcher';
 
@@ -40,6 +40,9 @@ const Navbar = ({ cartCount, setIsCartOpen }: NavbarProps) => {
         <div className="flex items-center space-x-4">
           <LanguageSwitcher />
           <Search className="w-5 h-5 cursor-pointer hover:text-sand-gold transition-colors hidden sm:block" />
+          <Link to="/admin" title="Administration">
+            <Settings className="w-5 h-5 cursor-pointer hover:text-sand-gold transition-colors hidden sm:block" />
+          </Link>
           <Link to="/profile">
             <User className="w-5 h-5 cursor-pointer hover:text-sand-gold transition-colors" />
           </Link>
