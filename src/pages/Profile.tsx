@@ -39,6 +39,85 @@ const countries = [
   { code: 'SG', name: 'Singapour' },
 ];
 
+interface AddressFormProps {
+  type: 'postalAddress' | 'shippingAddress';
+  title: string;
+  icon: React.ReactNode;
+  address: Address;
+  onAddressChange: (field: keyof Address, value: string) => void;
+  onCountryChange: (code: string) => void;
+  t: (key: string) => string;
+}
+
+const AddressForm = ({ 
+  type, 
+  title, 
+  icon,
+  address,
+  onAddressChange,
+  onCountryChange,
+  t
+}: AddressFormProps) => (
+  <div className="bg-card rounded-xl p-6 border border-border">
+    <h2 className="font-serif text-xl text-foreground mb-4 flex items-center gap-2">
+      {icon}
+      {title}
+    </h2>
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor={`${type}-street`}>{t('profile.street')}</Label>
+        <Input
+          id={`${type}-street`}
+          value={address.street}
+          onChange={(e) => onAddressChange('street', e.target.value)}
+          placeholder={t('profile.streetPlaceholder')}
+          className="mt-1"
+        />
+      </div>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor={`${type}-postalCode`}>{t('profile.postalCode')}</Label>
+          <Input
+            id={`${type}-postalCode`}
+            value={address.postalCode}
+            onChange={(e) => onAddressChange('postalCode', e.target.value)}
+            placeholder="98713"
+            className="mt-1"
+          />
+        </div>
+        <div>
+          <Label htmlFor={`${type}-city`}>{t('profile.city')}</Label>
+          <Input
+            id={`${type}-city`}
+            value={address.city}
+            onChange={(e) => onAddressChange('city', e.target.value)}
+            placeholder={t('profile.cityPlaceholder')}
+            className="mt-1"
+          />
+        </div>
+      </div>
+      <div>
+        <Label>{t('profile.country')}</Label>
+        <Select 
+          value={address.countryCode} 
+          onValueChange={onCountryChange}
+        >
+          <SelectTrigger className="mt-1">
+            <SelectValue placeholder={t('profile.selectCountry')} />
+          </SelectTrigger>
+          <SelectContent>
+            {countries.map((country) => (
+              <SelectItem key={country.code} value={country.code}>
+                {country.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
+  </div>
+);
+
 const Profile = () => {
   const navigate = useNavigate();
   const { profile, updateProfile } = useUserProfile();
@@ -92,75 +171,6 @@ const Profile = () => {
       description: t('profile.savedDescription'),
     });
   };
-
-  const AddressForm = ({ 
-    type, 
-    title, 
-    icon 
-  }: { 
-    type: 'postalAddress' | 'shippingAddress';
-    title: string;
-    icon: React.ReactNode;
-  }) => (
-    <div className="bg-card rounded-xl p-6 border border-border">
-      <h2 className="font-serif text-xl text-foreground mb-4 flex items-center gap-2">
-        {icon}
-        {title}
-      </h2>
-      <div className="space-y-4">
-        <div>
-          <Label htmlFor={`${type}-street`}>{t('profile.street')}</Label>
-          <Input
-            id={`${type}-street`}
-            value={formData[type].street}
-            onChange={(e) => handleAddressChange(type, 'street', e.target.value)}
-            placeholder={t('profile.streetPlaceholder')}
-            className="mt-1"
-          />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <Label htmlFor={`${type}-postalCode`}>{t('profile.postalCode')}</Label>
-            <Input
-              id={`${type}-postalCode`}
-              value={formData[type].postalCode}
-              onChange={(e) => handleAddressChange(type, 'postalCode', e.target.value)}
-              placeholder="98713"
-              className="mt-1"
-            />
-          </div>
-          <div>
-            <Label htmlFor={`${type}-city`}>{t('profile.city')}</Label>
-            <Input
-              id={`${type}-city`}
-              value={formData[type].city}
-              onChange={(e) => handleAddressChange(type, 'city', e.target.value)}
-              placeholder={t('profile.cityPlaceholder')}
-              className="mt-1"
-            />
-          </div>
-        </div>
-        <div>
-          <Label>{t('profile.country')}</Label>
-          <Select 
-            value={formData[type].countryCode} 
-            onValueChange={(code) => handleCountryChange(type, code)}
-          >
-            <SelectTrigger className="mt-1">
-              <SelectValue placeholder={t('profile.selectCountry')} />
-            </SelectTrigger>
-            <SelectContent>
-              {countries.map((country) => (
-                <SelectItem key={country.code} value={country.code}>
-                  {country.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-background">
@@ -244,6 +254,10 @@ const Profile = () => {
             type="postalAddress" 
             title={t('profile.postalAddress')}
             icon={<MapPin className="w-5 h-5" />}
+            address={formData.postalAddress}
+            onAddressChange={(field, value) => handleAddressChange('postalAddress', field, value)}
+            onCountryChange={(code) => handleCountryChange('postalAddress', code)}
+            t={t}
           />
 
           {/* Use same address checkbox */}
@@ -264,6 +278,10 @@ const Profile = () => {
               type="shippingAddress" 
               title={t('profile.shippingAddress')}
               icon={<MapPin className="w-5 h-5" />}
+              address={formData.shippingAddress}
+              onAddressChange={(field, value) => handleAddressChange('shippingAddress', field, value)}
+              onCountryChange={(code) => handleCountryChange('shippingAddress', code)}
+              t={t}
             />
           )}
 
