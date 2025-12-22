@@ -1,13 +1,15 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Navbar from '@/components/oceane/Navbar';
 import Footer from '@/components/oceane/Footer';
 import { ProductManager } from '@/components/oceane/ProductManager';
 import { ShippingManager } from '@/components/oceane/ShippingManager';
 import { useProducts } from '@/hooks/useProducts';
 import { useShippingZones } from '@/hooks/useShippingZones';
+import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Package, Truck, Settings, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Package, Truck, Settings, Plus, Pencil, Trash2, LogOut, User } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -25,7 +27,9 @@ const Admin = () => {
   const { products, addProduct, updateProduct, deleteProduct, resetProductsStorage } = useProducts();
   const { zones, updateZone, resetZones } = useShippingZones();
   const { t, formatPrice } = useLocale();
-  
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
@@ -66,14 +70,33 @@ const Admin = () => {
     setEditingProduct(undefined);
   };
 
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+    toast.success('Déconnexion réussie');
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar cartCount={0} setIsCartOpen={() => {}} />
       
       <main className="container mx-auto px-4 py-8 pt-24">
-        <div className="flex items-center gap-3 mb-8">
-          <Settings className="h-8 w-8 text-primary" />
-          <h1 className="font-serif text-3xl font-bold">Administration</h1>
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-3">
+            <Settings className="h-8 w-8 text-primary" />
+            <h1 className="font-serif text-3xl font-bold">Administration</h1>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <User className="h-4 w-4" />
+              <span>{user?.email}</span>
+            </div>
+            <Button variant="outline" size="sm" onClick={handleSignOut}>
+              <LogOut className="h-4 w-4 mr-2" />
+              Déconnexion
+            </Button>
+          </div>
         </div>
 
         <Tabs defaultValue="products" className="space-y-6">
