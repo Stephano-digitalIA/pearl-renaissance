@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -7,17 +7,23 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Mail, Lock, AlertCircle } from 'lucide-react';
+import { TwoFactorVerify } from './TwoFactorVerify';
+import { getAssuranceLevel, getFactors } from '@/services/twoFactor';
 
 interface LoginFormProps {
   onSuccess?: () => void;
   redirectTo?: string;
 }
 
+type LoginStep = 'credentials' | '2fa';
+
 export const LoginForm = ({ onSuccess, redirectTo = '/' }: LoginFormProps) => {
-  const { signIn, loading } = useAuth();
+  const { signIn, signOut, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [step, setStep] = useState<LoginStep>('credentials');
+  const [checking2FA, setChecking2FA] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,8 +47,41 @@ export const LoginForm = ({ onSuccess, redirectTo = '/' }: LoginFormProps) => {
       return;
     }
 
+    // Check if 2FA is required
+    setChecking2FA(true);
+    const { data: factors } = await getFactors();
+    const has2FA = factors?.some(f => f.status === 'verified') ?? false;
+
+    if (has2FA) {
+      const { currentLevel, nextLevel } = await getAssuranceLevel();
+
+      // If user has 2FA but hasn't completed the second factor
+      if (currentLevel === 'aal1' && nextLevel === 'aal2') {
+        setStep('2fa');
+        setChecking2FA(false);
+        return;
+      }
+    }
+
+    setChecking2FA(false);
     onSuccess?.();
   };
+
+  const handle2FASuccess = () => {
+    onSuccess?.();
+  };
+
+  const handle2FACancel = async () => {
+    // Sign out if user cancels 2FA
+    await signOut();
+    setStep('credentials');
+    setEmail('');
+    setPassword('');
+  };
+
+  if (step === '2fa') {
+    return <TwoFactorVerify onSuccess={handle2FASuccess} onCancel={handle2FACancel} />;
+  }
 
   return (
     <Card className="w-full max-w-md mx-auto">
@@ -72,7 +111,7 @@ export const LoginForm = ({ onSuccess, redirectTo = '/' }: LoginFormProps) => {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="pl-10"
-                disabled={loading}
+                disabled={loading || checking2FA}
                 autoComplete="email"
               />
             </div>
@@ -97,7 +136,7 @@ export const LoginForm = ({ onSuccess, redirectTo = '/' }: LoginFormProps) => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="pl-10"
-                disabled={loading}
+                disabled={loading || checking2FA}
                 autoComplete="current-password"
               />
             </div>
@@ -105,11 +144,11 @@ export const LoginForm = ({ onSuccess, redirectTo = '/' }: LoginFormProps) => {
         </CardContent>
 
         <CardFooter className="flex flex-col space-y-4">
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? (
+          <Button type="submit" className="w-full" disabled={loading || checking2FA}>
+            {loading || checking2FA ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Connexion en cours...
+                {checking2FA ? 'Vérification...' : 'Connexion en cours...'}
               </>
             ) : (
               'Se connecter'

@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { useLocale } from '@/contexts/LocaleContext';
+import { TwoFactorManagement } from '@/components/auth';
 
 interface ProfileData {
   firstName: string;
@@ -139,6 +140,9 @@ const Profile = () => {
             </div>
           </div>
         </div>
+
+        {/* Two-Factor Authentication Section */}
+        <TwoFactorManagement />
 
         {/* Address Section */}
         <div className="bg-card rounded-lg border border-border p-6">
