@@ -1,16 +1,20 @@
+import { useState } from 'react';
 import { ShoppingBag, X } from 'lucide-react';
 import { Product } from '@/types/oceane';
 import { useLocale } from '@/contexts/LocaleContext';
+import PaymentModal from './PaymentModal';
 
 interface CartDrawerProps {
   isOpen: boolean;
   closeCart: () => void;
   cartItems: Product[];
   removeFromCart: (index: number) => void;
+  clearCart?: () => void;
 }
 
-const CartDrawer = ({ isOpen, closeCart, cartItems, removeFromCart }: CartDrawerProps) => {
+const CartDrawer = ({ isOpen, closeCart, cartItems, removeFromCart, clearCart }: CartDrawerProps) => {
   const { formatPrice, t } = useLocale();
+  const [showPayment, setShowPayment] = useState(false);
   const total = cartItems.reduce((acc, item) => acc + item.price, 0);
 
   return (
@@ -70,14 +74,28 @@ const CartDrawer = ({ isOpen, closeCart, cartItems, removeFromCart }: CartDrawer
             <span>{t('cart.total')}</span>
             <span>{formatPrice(total)}</span>
           </div>
-          <button 
+          <button
             className="w-full bg-ocean-dark text-primary-foreground py-4 uppercase text-sm tracking-widest hover:bg-ocean-teal transition-colors disabled:opacity-50"
             disabled={cartItems.length === 0}
+            onClick={() => setShowPayment(true)}
           >
             {t('cart.checkout')}
           </button>
         </div>
       </div>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPayment}
+        onClose={() => setShowPayment(false)}
+        cartItems={cartItems}
+        total={total}
+        onPaymentSuccess={() => {
+          setShowPayment(false);
+          clearCart?.();
+          closeCart();
+        }}
+      />
     </>
   );
 };
