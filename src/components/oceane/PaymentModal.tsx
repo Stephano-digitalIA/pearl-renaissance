@@ -6,6 +6,7 @@ import { createPaymentIntent } from '@/services/stripe';
 import CheckoutForm from './CheckoutForm';
 import { Product } from '@/types/oceane';
 import { useLocale } from '@/contexts/LocaleContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PaymentModalProps {
   isOpen: boolean;
@@ -25,6 +26,7 @@ const PaymentModal = ({
   onPaymentSuccess,
 }: PaymentModalProps) => {
   const { formatPrice, t } = useLocale();
+  const { user } = useAuth();
   const [step, setStep] = useState<PaymentStep>('loading');
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -40,12 +42,20 @@ const PaymentModal = ({
     setError(null);
 
     try {
+      // Prepare cart items with required fields for the webhook
+      const items = cartItems.map((item) => ({
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        category: item.category,
+      }));
+
       const { clientSecret } = await createPaymentIntent({
         amount: total,
         currency: 'eur',
-        metadata: {
-          items: JSON.stringify(cartItems.map((item) => item.id)),
-        },
+        items,
+        customerEmail: user?.email || undefined,
+        userId: user?.id || undefined,
       });
       setClientSecret(clientSecret);
       setStep('payment');

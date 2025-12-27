@@ -25,7 +25,7 @@ import { useLocale } from '@/contexts/LocaleContext';
 interface ProductFormProps {
   open: boolean;
   onClose: () => void;
-  onSubmit: (product: Omit<Product, 'id'>) => void;
+  onSubmit: (product: Omit<Product, 'id'>) => void | Promise<void>;
   initialData?: Product;
 }
 
@@ -150,7 +150,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.image) {
       toast.error(t('form.imageRequired'));
@@ -158,7 +158,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
     }
 
     try {
-      onSubmit({
+      await onSubmit({
         name: formData.name.trim(),
         category: formData.category,
         price: parseFloat(formData.price) || 0,
@@ -177,13 +177,7 @@ export const ProductForm = ({ open, onClose, onSubmit, initialData }: ProductFor
       setImagePreview('');
     } catch (err: any) {
       const message = String(err?.message || err);
-      const isQuota =
-        err?.name === 'QuotaExceededError' ||
-        /quota/i.test(message) ||
-        /exceeded/i.test(message) ||
-        /localstorage/i.test(message);
-
-      toast.error(isQuota ? t('form.storageError') : t('form.genericError'));
+      toast.error(t('form.genericError') || message);
     }
   };
 

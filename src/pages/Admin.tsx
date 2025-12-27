@@ -24,7 +24,7 @@ import { Product } from '@/types/oceane';
 import { toast } from 'sonner';
 
 const Admin = () => {
-  const { products, addProduct, updateProduct, deleteProduct, resetProductsStorage } = useProducts();
+  const { products, addProduct, updateProduct, deleteProduct, refreshProducts, loading, error } = useProducts();
   const { zones, updateZone, resetZones } = useShippingZones();
   const { t, formatPrice } = useLocale();
   const { user, signOut } = useAuth();
@@ -33,9 +33,13 @@ const Admin = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | undefined>();
 
-  const handleAdd = (product: Omit<Product, 'id'>) => {
-    addProduct(product);
-    toast.success(t('form.added'));
+  const handleAdd = async (product: Omit<Product, 'id'>) => {
+    const result = await addProduct(product);
+    if (result) {
+      toast.success(t('form.added'));
+    } else {
+      toast.error('Erreur lors de l\'ajout du produit');
+    }
   };
 
   const handleEdit = (product: Product) => {
@@ -43,26 +47,32 @@ const Admin = () => {
     setFormOpen(true);
   };
 
-  const handleUpdate = (product: Omit<Product, 'id'>) => {
+  const handleUpdate = async (product: Omit<Product, 'id'>) => {
     if (editingProduct) {
-      updateProduct(editingProduct.id, product);
-      toast.success(t('form.updated'));
+      const success = await updateProduct(editingProduct.id, product);
+      if (success) {
+        toast.success(t('form.updated'));
+      } else {
+        toast.error('Erreur lors de la mise à jour');
+      }
       setEditingProduct(undefined);
     }
   };
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (confirm(t('form.deleteConfirm'))) {
-      deleteProduct(id);
-      toast.success(t('form.deleted'));
+      const success = await deleteProduct(id);
+      if (success) {
+        toast.success(t('form.deleted'));
+      } else {
+        toast.error('Erreur lors de la suppression');
+      }
     }
   };
 
-  const handleResetProducts = () => {
-    if (confirm(t('form.resetConfirm'))) {
-      resetProductsStorage();
-      toast.success(t('form.resetDone'));
-    }
+  const handleRefreshProducts = () => {
+    refreshProducts();
+    toast.success('Catalogue actualisé');
   };
 
   const handleFormClose = () => {
@@ -119,8 +129,8 @@ const Admin = () => {
                   {t('manager.title')}
                 </h2>
                 <div className="flex gap-2">
-                  <Button variant="outline" size="sm" onClick={handleResetProducts}>
-                    {t('manager.reset')}
+                  <Button variant="outline" size="sm" onClick={handleRefreshProducts} disabled={loading}>
+                    {loading ? 'Chargement...' : 'Actualiser'}
                   </Button>
                   <Button onClick={() => setFormOpen(true)} size="sm">
                     <Plus className="h-4 w-4 mr-2" />

@@ -1,9 +1,28 @@
 import { supabase } from '@/integrations/supabase/client';
 
+interface CartItem {
+  id: number;
+  name: string;
+  price: number;
+  category?: string;
+}
+
+interface ShippingAddress {
+  address: string;
+  city: string;
+  postalCode?: string;
+  country: string;
+}
+
 interface CreatePaymentIntentParams {
   amount: number;
   currency?: string;
-  metadata?: Record<string, string>;
+  items: CartItem[];
+  customerEmail?: string;
+  customerName?: string;
+  userId?: string;
+  shippingAddress?: ShippingAddress;
+  shippingCost?: number;
 }
 
 interface PaymentIntentResponse {
@@ -14,10 +33,24 @@ interface PaymentIntentResponse {
 export async function createPaymentIntent({
   amount,
   currency = 'eur',
-  metadata = {},
+  items,
+  customerEmail,
+  customerName,
+  userId,
+  shippingAddress,
+  shippingCost = 0,
 }: CreatePaymentIntentParams): Promise<PaymentIntentResponse> {
   const { data, error } = await supabase.functions.invoke('create-payment-intent', {
-    body: { amount, currency, metadata },
+    body: {
+      amount,
+      currency,
+      items,
+      customerEmail,
+      customerName,
+      userId,
+      shippingAddress,
+      shippingCost,
+    },
   });
 
   if (error) {
