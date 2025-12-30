@@ -130,6 +130,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Connexion avec Google
+  const signInWithGoogle = async () => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
+      });
+
+      if (error) {
+        return { error };
+      }
+
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Déconnexion
   const signOut = async () => {
     try {
@@ -196,6 +219,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         initialized,
         signUp,
         signIn,
+        signInWithGoogle,
         signOut,
         resetPassword,
         updatePassword,

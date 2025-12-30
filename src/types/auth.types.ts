@@ -28,6 +28,7 @@ export interface SignInCredentials {
 export interface AuthContextType extends AuthState {
   signUp: (credentials: SignUpCredentials) => Promise<{ error: Error | null }>;
   signIn: (credentials: SignInCredentials) => Promise<{ error: Error | null }>;
+  signInWithGoogle: () => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
   resetPassword: (email: string) => Promise<{ error: Error | null }>;
   updatePassword: (newPassword: string) => Promise<{ error: Error | null }>;

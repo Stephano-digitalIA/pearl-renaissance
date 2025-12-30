@@ -5,3 +5,4 @@ export { ProtectedRoute } from './ProtectedRoute';
 export { TwoFactorSetup } from './TwoFactorSetup';
 export { TwoFactorVerify } from './TwoFactorVerify';
 export { TwoFactorManagement } from './TwoFactorManagement';
+export { GoogleAuthButton } from './GoogleAuthButton';

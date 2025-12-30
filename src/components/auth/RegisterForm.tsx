@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Mail, Lock, User, AlertCircle, CheckCircle } from 'lucide-react';
+import { GoogleAuthButton } from './GoogleAuthButton';
 
 interface RegisterFormProps {
   onSuccess?: () => void;
@@ -118,6 +119,19 @@ export const RegisterForm = ({ onSuccess }: RegisterFormProps) => {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
+
+          <GoogleAuthButton mode="register" />
+
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-background px-2 text-muted-foreground">
+                Ou créer un compte avec
+              </span>
+            </div>
+          </div>
 
           <div className="space-y-2">
             <Label htmlFor="fullName">Nom complet (optionnel)</Label>
